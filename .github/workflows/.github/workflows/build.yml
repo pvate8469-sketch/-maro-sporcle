@@ -18,6 +18,8 @@ jobs:
     - name: Unzip project archive
       run: |
         unzip -o SporcleOverlayProject.zip
+        # نقل جميع الملفات والمجلدات المخفية والعادية من داخل المجلد الرئيسي إلى المكان الحالي
+        shopt -s dotglob
         cp -r SporcleOverlayProject/* . || true
 
     - name: Set up JDK 17
@@ -27,7 +29,12 @@ jobs:
         distribution: 'temurin'
 
     - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      run: |
+        # في حال عدم وجود gradlew مسبقاً، يتم توليده باستخدام gradle المستقل
+        if [ ! -f gradlew ]; then
+          gradle wrapper
+        fi
+        chmod +x gradlew
 
     - name: Build Debug APK
       run: ./gradlew assembleDebug
